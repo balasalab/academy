@@ -12,5 +12,13 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
+});
+
+Route::group(["prefix"=>"api"], function(){
+	Route::post('/signup', 'UserController@create');
+	Route::post('/get/keys', 'UserController@getAuthKeys');
+	Route::get('/users', 'UserController@get');
+	Route::post('/ride/give', 'JournerController@create');
+	Route::post('/ride/take', 'JoinerController@create');
 });
