@@ -8,7 +8,7 @@
 	  <div class="panel-body">
 	    <div class="row">
 			<div class="col-md-6">
-			    <form class="form-horizontal to-start form-register" method="post" enctype="multipart/form-data">
+			    <form class="form-horizontal to-start form-register" id="form-register" method="post" enctype="multipart/form-data">
 			      <div class="form-group">
 			        <label class="col-sm-3 control-label" for="exampleInputUsername">Username</label>
 			        <div class="col-sm-7">
@@ -77,7 +77,13 @@
 			      </div>
 			      
 			    </form>
-			</div>	      
+			</div>	 
+			<div class="col-md-6" id="alert-messages">
+				<div class="alert alert-info alert-dismissible" role="alert">
+				  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				  <strong>Welcome KleverKid!</strong>
+				</div>
+			</div>     
 	    </div>
 	  </div>
 	</div>
@@ -91,9 +97,12 @@
 	            async: false,
 	            success: function (data) {
 	                if(data.status == 'success'){
-	                    alert('Successfully registred.');
+	                    // alert('Successfully registred.');
+	                    document.getElementById("alert-messages").innerHTML += ('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Successfully registred.</div>');
+	                    document.getElementById("form-register").reset();
 	                }else{
-	                    alert(data.message);
+	                    // alert(data.message);
+	                    document.getElementById("alert-messages").innerHTML += ('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+data.message+'</div>');
 	                }
 	            },
 	            error: function (data){
