@@ -20,3 +20,16 @@
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
+<style type="text/css">
+  body {
+      background-color: #2BA255;/*#792BA2;*/
+      color: #0B5225;/*#E6B6FF;*/
+      font-family: 'Roboto', sans-serif;
+      /*background-image: -webkit-radial-gradient(50% top, rgba(84,90,182,0.6) 0%,rgba(84,90,182,0) 75%),-webkit-radial-gradient(right top, #794aa2 0%,rgba(121,74,162,0) 57%);*/
+      /*background-image: radial-gradient( at 50% top, rgba(84,90,182,0.6) 0%,rgba(84,90,182,0) 75%),radial-gradient( at right top, #794aa2 0%,rgba(121,74,162,0) 57%);*/
+      background-image: -webkit-radial-gradient(50% top, rgba(84, 159, 182, 0.6) 0%,rgba(84,90,182,0) 75%),radial-gradient( at right top, #2D9C5C 0%,rgba(121,74,162,0) 57%);
+      background-image: radial-gradient( at 50% top, rgba(84, 159, 182, 0.6) 0%,rgba(84,90,182,0) 75%),radial-gradient( at right top, #2D9C5C 0%,rgba(121,74,162,0) 57%);
+      background-repeat: no-repeat;
+      background-size: contain;
+  }
+</style>

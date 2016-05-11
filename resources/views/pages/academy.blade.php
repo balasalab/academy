@@ -19,7 +19,7 @@
               <div class="col-md-10 sub-rows">
                   <span class="">{{$data->timeslots}}</span>
               </div>
-              
+
               <div class="col-md-2 sub-rows">
                   <span class="glyphicon glyphicon-phone" aria-hidden="true"></span>
                   Phone: 
@@ -30,7 +30,7 @@
 
               <div class="col-md-2 sub-rows">
                   <span class="glyphicon glyphicon-envelope"></span>
-                  Emial: 
+                  Email: 
               </div>
               <div class="col-md-10 sub-rows">
                 <span class="">{{$data->email}}</span>
@@ -48,7 +48,7 @@
             </div>
 	      	</div>
 
-        	<div class="row">
+        	<div class="row imagesrow">
         		@foreach ($data->images as $value)
 	            <div class="col-xs-6 col-lg-4">
 	              <img width="100%" src="../storage/app/images/academy/{{ $value->url }}" >
@@ -72,6 +72,12 @@
       .sub-rows{
         margin: 5px 0px;
         font-size: 16px;
+      }
+      .imagesrow{
+        background-color: #eee;
+        margin: 2px;
+        border-radius: 8px;
+        padding: 18px 0px;
       }
     </style>
 @stop
