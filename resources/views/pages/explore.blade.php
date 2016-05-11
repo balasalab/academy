@@ -19,7 +19,7 @@
     	                  });
 
     	          var script = document.createElement('script');
-    	          script.src = '/bala/kids/api/get/map/json';
+    	          script.src = "<?php echo url('/'); ?>/api/get/map/json";
     	          document.getElementsByTagName('head')[0].appendChild(script);
     	        }
     	        window.eqfeed_callback = function(results) {
