@@ -98,7 +98,7 @@
 	            success: function (data) {
 	                if(data.status == 'success'){
 	                    // alert('Successfully registred.');
-	                    document.getElementById("alert-messages").innerHTML += ('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Successfully registred.</div>');
+	                    document.getElementById("alert-messages").innerHTML += ('<div class="alert alert-success alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>Successfully registred. <a href="<?php echo url('/'); ?>/explore">Goto Explore</a></div>');
 	                    document.getElementById("form-register").reset();
 	                }else{
 	                    // alert(data.message);
