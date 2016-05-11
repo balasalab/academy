@@ -80,7 +80,7 @@ class UserController extends Controller
 	    	//image upload
 	    	if ($request->file('image')->isValid()) {
 	    	  $fileName = str_replace(' ', '', $request->academy_name).'_'.time().'_'.$request->file('image')->getClientOriginalName();
-	    	  $fileUploadResult = $request->file('image')->move(__DIR__.'/../../../storage/images/academy', $fileName);
+	    	  $fileUploadResult = $request->file('image')->move(__DIR__.'/../../../storage/app/images/academy', $fileName);
 	    	  if($fileUploadResult)
 	    	  {
 					$image = new ImageController();
@@ -161,15 +161,22 @@ class UserController extends Controller
 
     function view($id, Request $request) {
 	    $data = User::where('id', '=', $id)->with('tags')->with('images')->first();
-	    if($request->input('blockmail')!=1){
-		    $maildata['academy_name'] = $data->academy_name;
-		    $maildata['description'] = $data->description;
-		    Mail::send('emails.viewtrigger', $maildata, function ($message) {
-		        $message->from('codeandfood@gmail.com', 'KleverKid WebPage');
-		        $message->to('codeandfood@gmail.com')->subject('Someone views the page');
-		    });
-		}
+	    if($data){
+		    if($request->input('blockmail')!=1){
+			    $maildata['academy_name'] = $data->academy_name;
+			    $maildata['description'] = $data->description;
+			    Mail::send('emails.viewtrigger', $maildata, function ($message) {
+			        $message->from('codeandfood@gmail.com', 'KleverKid WebPage');
+			        $message->to('codeandfood@gmail.com')->subject('Someone views the page');
+			    });
+			}
+	    	return View::make('pages.academy')->with('data', $data);
+	    }
+	    else{
+	    	return View::make('errors.503');
+	    }
+	    exit();
 
-	    return View::make('pages.academy')->with('data', $data);
+
     }
 }
