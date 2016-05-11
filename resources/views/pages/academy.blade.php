@@ -21,7 +21,7 @@
         	<div class="row">
         		@foreach ($data->images as $value)
 	            <div class="col-xs-6 col-lg-4">
-	              <img width="100%" src="../resources/assets/image/{{ $value->url }}" >
+	              <img width="100%" src="../storage/images/academy/{{ $value->url }}" >
 	            </div><!--/.col-xs-6.col-lg-4-->
 	            @endforeach
 	        </div>

@@ -80,7 +80,7 @@ class UserController extends Controller
 	    	//image upload
 	    	if ($request->file('image')->isValid()) {
 	    	  $fileName = str_replace(' ', '', $request->academy_name).'_'.time().'_'.$request->file('image')->getClientOriginalName();
-	    	  $fileUploadResult = $request->file('image')->move(__DIR__.'/../../../resources/assets/image', $fileName);
+	    	  $fileUploadResult = $request->file('image')->move(__DIR__.'/../../../storage/images/academy', $fileName);
 	    	  if($fileUploadResult)
 	    	  {
 					$image = new ImageController();
