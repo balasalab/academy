@@ -11,13 +11,25 @@
 |
 */
 
-Route::get('/', function () {
-    return view('home');
+Route::get('/', function()
+{
+    return View::make('pages.home');
 });
+Route::get('register', function()
+{
+    return View::make('pages.register');
+});
+Route::get('explore', function()
+{
+    return View::make('pages.explore');
+});
+Route::get('/academy/{id}', 'UserController@view');
 
 Route::group(["prefix"=>"api"], function(){
 	Route::post('/signup', 'UserController@create');
-	Route::post('/get/keys', 'UserController@getAuthKeys');
+	Route::get('/get', 'UserController@get');
+	Route::get('/get/map/json', 'UserController@getMapJson');
+
 	Route::get('/users', 'UserController@get');
 	Route::post('/ride/give', 'JournerController@create');
 	Route::post('/ride/take', 'JoinerController@create');

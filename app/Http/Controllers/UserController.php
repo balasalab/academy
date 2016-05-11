@@ -9,47 +9,94 @@ use Validator;
 use Exception;
 use Log;
 use DB;
+use Illuminate\Support\Facades\Input;
+use View;
+use Mail;
 
-use App\Http\Controllers\AuthKeyController;
+use App\Model\User;
+use App\Http\Controllers\TagsController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\ResponseController;
 
 class UserController extends Controller
 {
 	/**
-	 * Create user
+	 * User register
 	 * @param  Request $request [description]
 	 * @return [type]           [description]
 	 *
 	 * success code 200
 	 */
+	
+	// user name, academy name, timeslots, images, email, phone, tags(Multiple), description, latitude and longitude.
     public function create(Request $request){
     	Log::info(__CLASS__.'::'.__FUNCTION__.'() ==>');
     	try {
 		    DB::beginTransaction();
 			$validator = Validator::make($request->all(), [
-			        'name' => 'required|max:255',
-                    'email' => 'required|email|max:255|unique:users',
-                    'password' => 'required|min:6',
+			        'username' => 'required|max:30',
+                    'email' => 'required|email|max:50|unique:user',
+                    'academy_name' => 'required|max:100',
+                    'timeslots' => 'required|max:30',
+                    'phone' => 'required|max:11',
+                    'description' => 'required|max:500',
+                    'latitude' => 'required|max:20',
+                    'longitude' => 'required|max:20|regex:/^([-+]?\d{1,2}([.]\d+)?)$/',
+                    'tags' => 'required|max:225',
 			    ]);
+			// var_dump($request->file('image')->move(__DIR__.'/../../../resources/assets/image'));exit();
+
+
+			$file = array('image' => Input::file('image'));
+			$rules = array('image' => 'required',); //mimes:jpeg,bmp,png and for max size max:10000
+			$imageValidator = Validator::make($file, $rules);
+			if ($imageValidator->fails()) {
+				throw new Exception($imageValidator->errors()->all()[0], 1);
+			}
+
 			if ($validator->fails()) {
-		        throw new Exception($validator->errors()->all()[0], 1);   
+		        throw new Exception($validator->errors()->all()[0], 1); 
 		    }
-		    $user = new \App\User();
-	    	$user->name = $request->name;
+		    $user = new User();
+	    	$user->username = $request->username;
+	    	$user->academy_name = $request->academy_name;
+	    	$user->timeslots = $request->timeslots;
 	    	$user->email = $request->email;
-	    	$user->password = bcrypt($request->possword);
+	    	$user->phone = $request->phone;
+	    	$user->description = $request->description;
+	    	$user->latitude = $request->latitude;
+	    	$user->longitude = $request->longitude;
 	    	$userInsert = $user->save();
 	    	if(!$userInsert):
 	    		throw new Exception("User registration failed.", 1);
 	    	endif;
 	    	$userId = $user->id;
-	    	$authKey = new AuthKeyController();
-	    	$result = $authKey->generate($userId);
+	    	$tag = new TagsController();
+	    	$result = $tag->insertTag($userId, $request->tags);
 	    	if(!$result):
-	    		throw new Exception("Failed to generate authentication key.", 1);
+	    		throw new Exception("Failed to insert tag key.", 1);
 	    	endif;
+
+	    	//image upload
+	    	if ($request->file('image')->isValid()) {
+	    	  $fileName = str_replace(' ', '', $request->academy_name).'_'.time().'_'.$request->file('image')->getClientOriginalName();
+	    	  $fileUploadResult = $request->file('image')->move(__DIR__.'/../../../resources/assets/image', $fileName);
+	    	  if($fileUploadResult)
+	    	  {
+					$image = new ImageController();
+					$imageResult = $image->insertImage($userId, $fileName);
+					if(!$imageResult):
+						throw new Exception("Failed to insert image.", 1);
+					endif;	    	  	
+	    	  }
+	    	}
+	    	else {
+	    	  	throw new Exception("Failed to upload image. Image not valid.", 1);
+	    	}
+	    	//image upload
+
 	    	DB::commit();
-			return ['status'=>'200', 'result' => $result ];
+			return ['status'=>'success', 'result' => $result ];
     	} catch (Exception $e) {
     		DB::rollBack();
     		Log::error("Message : ".$e->getMessage());
@@ -62,39 +109,67 @@ class UserController extends Controller
     public function get(){
     	Log::info(__CLASS__.'::'.__FUNCTION__.'() ==>');
     	try {
-    		$result = \App\User::get();
+    		$result = User::get();
     		return ['status'=>'success', 'data' => $result ];
     	} catch (Exception $e) {
-    		
-    	}
-    	Log::info(__CLASS__.'::'.__FUNCTION__.'() <==');
-    }
-
-    function getAuthKeys(Request $request){
-    	Log::info(__CLASS__.'::'.__FUNCTION__.'() ==>');
-    	try {
-			$validator = Validator::make($request->all(), [
-                    'email' => 'required|email|max:255',
-                    'password' => 'required|min:6',
-			    ]);
-			if ($validator->fails()) {
-		        throw new Exception($validator->errors()->all()[0], 1);   
-		    }
-		    $user = \App\User::where(['email' => $request->email , 'password' => hash('sha256', $request->password)])->first();
-	    	if(!$user):
-	    		throw new Exception("Sorry! Invalid credentials.", 1);
-	    	endif;
-	    	$userId = $user->id;
-	    	$authKey = \App\Model\AuthKeys::where(['user_id'=>$userId])->first();
-	    	if(!$authKey):
-	    		throw new Exception("Authentication key not exist", 1);
-	    	endif;
-			return ['status'=>'success', 'data' => array('api_key'=>$authKey->api_key, 'api_secret'=>$authKey->api_secret) ];
-    	} catch (Exception $e) {
+    		DB::rollBack();
     		Log::error("Message : ".$e->getMessage());
     		Log::error("Line : ".$e->getLine());
     		Log::error("File : ".$e->getFile());
     		return ['status'=>'error', 'message' => $e->getMessage()];
     	}
+    	Log::info(__CLASS__.'::'.__FUNCTION__.'() <==');
+    }
+
+    public function getMapJson()
+    {
+    	Log::info(__CLASS__.'::'.__FUNCTION__.'() ==>');
+    	try {
+    		$result = User::get();
+
+    		$data = array();
+    		$data['type']="FeatureCollection";
+    		$features= array();
+
+    		foreach ($result as $key => $value) {
+    			$properties = array();
+    			$properties["title"] = $value->academy_name;
+    			$properties["id"] = $value->id;
+    			$properties["url"] = url('/')."/academy/".$value->id;
+    			$properties["marker-symbol"] = "start";
+    			$properties["marker-color"]="#ff8888";
+				$properties["marker-size"]="large";
+    			$features[$key]["properties"] = $properties;
+
+	    		$features[$key]["type"] = "Feature";
+	    		$features[$key]["geometry"] = array("type"=>"Point", "coordinates"=>[$value->latitude,$value->longitude]);
+    		}
+
+    		$data['features']= $features;
+
+    		return "eqfeed_callback(".json_encode($data).")";
+    	} catch (Exception $e) {
+    		DB::rollBack();
+    		Log::error("Message : ".$e->getMessage());
+    		Log::error("Line : ".$e->getLine());
+    		Log::error("File : ".$e->getFile());
+    		return ['status'=>'error', 'message' => $e->getMessage()];
+    	}
+    	Log::info(__CLASS__.'::'.__FUNCTION__.'() <==');
+    }
+
+
+    function view($id, Request $request) {
+	    $data = User::where('id', '=', $id)->with('tags')->with('images')->first();
+	    if($request->input('blockmail')!=1){
+		    $maildata['academy_name'] = $data->academy_name;
+		    $maildata['description'] = $data->description;
+		    Mail::send('emails.viewtrigger', $maildata, function ($message) {
+		        $message->from('codeandfood@gmail.com', 'KleverKid WebPage');
+		        $message->to('codeandfood@gmail.com')->subject('Someone views the page');
+		    });
+		}
+
+	    return View::make('pages.academy')->with('data', $data);
     }
 }
