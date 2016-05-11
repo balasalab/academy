@@ -7,7 +7,7 @@
       <div class="panel-body">
       	<ul>
       		<li><a href="{{url("/")}}/register">Register</a></li>
-      		<li><a href="{{url("/")}}/explore">Exoplore</a></li>
+      		<li><a href="{{url("/")}}/explore">Explore</a></li>
       	</ul>
       </div>
     </div>
